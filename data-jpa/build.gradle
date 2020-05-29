@@ -19,6 +19,8 @@ repositories {
 }
 
 dependencies {
+	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.5.6'	// 스프링부트가 미리 지원하지 않는거는 버전정보를 적어좀	(운영에서는 잘 안쓰임)
+
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'
