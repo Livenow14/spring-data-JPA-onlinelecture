@@ -1,6 +1,8 @@
 package com.livenow.datajpa.repository;
 
 import com.livenow.datajpa.domain.Member;
+import com.livenow.datajpa.domain.Team;
+import com.livenow.datajpa.dto.MemberDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MemberRepositoryTest {
 
     @Autowired MemberRepository memberRepository;
+    @Autowired TeamRepository teamRepository;
 
     @DisplayName("Data Jpa 확인")
     @Test
@@ -94,5 +97,33 @@ class MemberRepositoryTest {
 
     }
 
+    @Test
+    public void findUsernameList() {
+        Member member = new Member("AAA", 10);
+        Member member1 = new Member("AAA", 20);
+        memberRepository.save(member);
+        memberRepository.save(member1);
+
+        List<String> usernameList = memberRepository.findUsernameList();
+
+        assertThat(usernameList.get(0)).isEqualTo(member.getUserName());
+        assertThat(usernameList.get(1)).isEqualTo(member1.getUserName());
+
+    }
+
+
+    @Test
+    public void findMemberDto() {
+        Team team = new Team("teamA");
+        teamRepository.save(team);
+
+        Member member = new Member("AAA", 10);
+        member.setTeam(team);
+        memberRepository.save(member);
+
+        List<MemberDto> memberDto = memberRepository.findMemberDto();
+
+        assertThat(memberDto.get(0).getTeamName()).isEqualTo(member.getTeam().getName());
+    }
 
 }
