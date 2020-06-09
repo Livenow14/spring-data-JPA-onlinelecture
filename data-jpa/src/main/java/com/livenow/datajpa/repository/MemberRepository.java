@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
@@ -31,6 +32,16 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("select new com.livenow.datajpa.dto.MemberDto(m.id, m.userName, t.name) from Member m join m.team t ")
     List<MemberDto> findMemberDto();
 
+    /**
+     * 파라미터 바인딩
+     */
     @Query("select m from Member m where m.userName in :names")
     List<Member> findByNames(@Param("names") Collection<String> names);
+
+    /**
+     * 반환타입, 위와같은 것을 지원해준다.
+     */
+    List<Member> findMemberListByUserName(String username); //컬렉션
+    Member findMemberByUserName(String username); //단건
+    Optional<Member> findOptionalByUserName(String username); //단건 Optional
 }

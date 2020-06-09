@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -143,5 +144,51 @@ class MemberRepositoryTest {
         assertThat(result.get(1).getUserName()).isEqualTo(member1.getUserName());
 
     }
+
+    /**
+     * 반환타입
+     */
+    @Test
+    public void returnType() {
+        Member member = new Member("AAA", 10);
+        Member member1 = new Member("BBB", 20);
+        memberRepository.save(member);
+        memberRepository.save(member1);
+
+
+        //데이터가 없을때 빈 entity 클래스를 반환한다. 즉 널을 반환하지 않는다.
+        List<Member> aaa = memberRepository.findMemberListByUserName("AAA");
+        System.out.println("aaa = " + aaa);
+
+
+        /**
+         * 데이터를 없을때, null을 반환한다.
+         * JPA는 nullException을 터트린다. 그거와 차이가 있다.
+         *
+         */
+        Member memberByUserName = memberRepository.findMemberByUserName("AAA");
+        Member adfadf = memberRepository.findMemberByUserName("adfasdf");
+
+
+        /**
+         * 위와같은 문제를 해결하려, Optional이 나왔다.
+         * 그렇기 때문에 단건일때 데이터가 잇을수도 있고, 없을 수 도 있으면 Optional을 사용한다.
+         *
+         */
+        Optional<Member> aaa1 = memberRepository.findOptionalByUserName("dfdf");
+
+        /**
+         * 이런경우일 땐 오류가난다.
+         */
+        Member member2 = new Member("AAA", 20);
+       // memberRepository.save(member2);
+        Optional<Member> aaa2 = memberRepository.findOptionalByUserName("AAA");
+
+
+       System.out.println("aaa2 = " + aaa2);
+
+
+    }
+
 
 }
