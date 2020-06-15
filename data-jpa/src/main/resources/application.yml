@@ -10,6 +10,7 @@ spring:
      ddl-auto: create   #실행 시점에 table을 드랍하고 다시 생성 none으로 설정하면 안그렇게 됨
     properties:
       hibernate:
+      #  dialect:                     #방언 설정
      #  show_sql: true
        format_sql: true
      #  default_batch_fetch_size: 100    # 이거는 무조건 켜주는게 좋다. 인쿼리의 갯수 (쿼리를 많이 줄여줌 )

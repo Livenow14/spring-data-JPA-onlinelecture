@@ -50,4 +50,27 @@ public class MemberJpaRepository {
                 .setParameter("age", age)
                 .getResultList();
     }
+
+    /**
+     * setFistResult = 몇번째부터 가져올거야
+     * setMaxResult = 몇개나 가져올것이냐?
+     */
+    public List<Member> findByPage(int age, int offset, int limit){
+        return em.createQuery("select m from Member m" +
+                " where m.age= :age order by m.userName desc", Member.class)
+                .setParameter("age", age)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+    }
+
+    /**
+     * counting은 sorting을 해야할 필요가 없으니, 성능최적화를 위해 제거함
+     */
+    public long totalCount(int age){
+       return em.createQuery("select count (m) from Member m " +
+                " where m.age=:age", Long.class)
+                .setParameter("age", age)
+                .getSingleResult();
+    }
 }
