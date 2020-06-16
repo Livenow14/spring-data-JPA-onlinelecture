@@ -7,6 +7,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -190,5 +194,66 @@ class MemberRepositoryTest {
 
     }
 
+    @DisplayName("JPA paging확인")
+    @Test
+    public void paging() throws Exception{
+        //given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 10));
+        memberRepository.save(new Member("member3", 10));
+        memberRepository.save(new Member("member4", 10));
+        memberRepository.save(new Member("member5", 10));
 
+        int age=10;
+
+        /**
+         *  query의 limit를 위한것
+         *  실제 값들은 반환타입에 의해 결정됨 (repo 반환타입 변경 필수)
+         */
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "userName"));
+
+        //when
+        // total count까지 날려줌
+        Page<Member> pagePaging = memberRepository.findByAge(age, pageRequest);
+
+        /**
+         * Entity를 그대로 반환하면 안되기 때문에 map을 사용한다.
+         * 페이지를 유지하면서 엔티티를 DTO로 변환
+         */
+        Page<MemberDto> map = pagePaging.map(member -> new MemberDto(member.getId(), member.getUserName(), null));
+
+        /**
+         * 이럴때 Dto로 변환하기 때문에, 바로 반환해도 괜찮다.
+         */
+
+        //then
+        List<Member> content = pagePaging.getContent();
+        long totalElements = pagePaging.getTotalElements();
+
+        for (Member member : content) {
+            System.out.println("member = " + member);
+        }
+        System.out.println("totalElements = " + totalElements);
+
+        assertThat(content.size()).isEqualTo(3);
+        assertThat(pagePaging.getTotalElements()).isEqualTo(5);
+        assertThat(pagePaging.getNumber()).isEqualTo(0);
+        assertThat(pagePaging.getTotalPages()).isEqualTo(2);
+        assertThat(pagePaging.isFirst()).isTrue();
+        assertThat(pagePaging.hasNext()).isTrue();
+
+/*        //when
+        //slice 다음페이지 넘기지않고, 더 불러오는것(ex, 어플의 내리기 새로고침)
+        Slice<Member> page = memberRepository.findByAge(age, pageRequest);
+        List<Member> content = page.getContent();
+        //then
+        assertThat(content.size()).isEqualTo(3);
+   //     assertThat(page.getTotalElements()).isEqualTo(5);
+        assertThat(page.getNumber()).isEqualTo(0);
+     //   assertThat(page.getTotalPages()).isEqualTo(2);
+        assertThat(page.isFirst()).isTrue();
+        assertThat(page.hasNext()).isTrue();*/
+
+
+    }
 }
