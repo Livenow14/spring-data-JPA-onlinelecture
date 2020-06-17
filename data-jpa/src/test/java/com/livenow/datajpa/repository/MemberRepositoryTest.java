@@ -204,7 +204,7 @@ class MemberRepositoryTest {
         memberRepository.save(new Member("member4", 10));
         memberRepository.save(new Member("member5", 10));
 
-        int age=10;
+        int age=9;
 
         /**
          *  query의 limit를 위한것
@@ -241,6 +241,15 @@ class MemberRepositoryTest {
         assertThat(pagePaging.getTotalPages()).isEqualTo(2);
         assertThat(pagePaging.isFirst()).isTrue();
         assertThat(pagePaging.hasNext()).isTrue();
+
+
+        /**
+         * Query Methods 기능 활용
+         */
+        List<Member> byAgeGreaterThan = memberRepository.findByAgeGreaterThan(age, pageRequest);
+        for (Member member : byAgeGreaterThan) {
+            System.out.println("member = " + member.getUserName());
+        }
 
 /*        //when
         //slice 다음페이지 넘기지않고, 더 불러오는것(ex, 어플의 내리기 새로고침)

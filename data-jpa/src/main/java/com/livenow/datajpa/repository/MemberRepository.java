@@ -55,6 +55,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     //Page<Member> findByAge(int age, Pageable pageable);
 
     /**
+     * 페이징, count쿼리 사요안함
+     *Query Methods 기능 활용
+     */
+    List<Member> findByAgeGreaterThan(int age, Pageable pageable);
+
+    /**
      * slice, 어플의 밑으로 더보기 이런 형식을 사용할 때
      */
     //Slice<Member> findByAge(int age, Pageable pageable);
