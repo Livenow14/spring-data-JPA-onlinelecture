@@ -14,6 +14,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +29,8 @@ class MemberRepositoryTest {
 
     @Autowired MemberRepository memberRepository;
     @Autowired TeamRepository teamRepository;
+    @PersistenceContext
+    EntityManager em;
 
     @DisplayName("Data Jpa 확인")
     @Test
@@ -264,5 +268,41 @@ class MemberRepositoryTest {
         assertThat(page.hasNext()).isTrue();*/
 
 
+    }
+
+    /**
+     * 벌크성 수정쿼리
+     * @Modifying 이 있어야 update쿼리를 실행함
+     * DB에 바로 update하기 때문에 영속성 컨텍스트에서 조회가 안됨
+     * 다른 update도 모두 체크해야함 .
+     */
+    @Test
+    public void bulkUpdate(){
+        //given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 20));
+        memberRepository.save(new Member("member3", 30));
+        memberRepository.save(new Member("member4", 40));
+        memberRepository.save(new Member("member5", 50));
+
+        //when
+        int resultCount = memberRepository.bulkAgePlus(20);
+
+/*        em.flush();             // 혹시 남아있는것 commit해주는것(사실상 save할때 해줌 )
+        em.clear();             // 날려주는것  modify옵션을 해주면 안해도됨  */
+
+        //DB에 바로 update하기 때문에  영속성 컨텍스트에서 반영이 안됨 안됨
+        List<Member> result = memberRepository.findMemberListByUserName("member5");
+
+        //그렇기 때문에 영속성 컨텍스트를 조회전 날려줘야함
+
+
+
+        Member member5 = result.get(0);
+        System.out.println("member5 = " + member5);
+
+        //then
+        assertThat(resultCount).isEqualTo(4);
+        assertThat(result.get(0).getAge()).isEqualTo(51);
     }
 }
