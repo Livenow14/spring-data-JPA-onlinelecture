@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -45,6 +46,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     /**
      * 반환타입, 위와같은 것을 지원해준다.
+     * 참고: 단건으로 지정한 메서드를 호출하면 스프링 데이터 JPA는 내부에서 JPQL의
+     * Query.getSingleResult() 메서드를 호출한다. 이 메서드를 호출했을 때 조회 결과가 없으면
+     * javax.persistence.NoResultException 예외가 발생하는데 개발자 입장에서 다루기가 상당히 불편하
+     * 다. 스프링 데이터 JPA는 단건을 조회할 때 이 예외가 발생하면 예외를 무시하고 대신에 null 을 반환한다
      */
     List<Member> findMemberListByUserName(String username); //컬렉션
     Member findMemberByUserName(String username); //단건
@@ -83,4 +88,24 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("update Member m set m.age = m.age +1 where m.age >=:age")
     int bulkAgePlus(@Param("age")int age);
 
+
+    @Query("select m from Member m join fetch m.team t")
+    List<Member> findMemberFetchJoin();
+
+    /**
+     * 엔티티 그래프를 사용하면 @Query(jpql)를 사용하지 않아도 된다.
+     * fetch조인을 저절로 해준다고 생각.
+     * 쿼리가 복잡해진다면 jpql를 사용하여 fetch join을 사용한다.
+     * 간단한 fetch join은 밑과 같이 사용한다.
+     */
+    @Override
+    @EntityGraph(attributePaths = "team")
+    List<Member> findAll();
+
+    @EntityGraph(attributePaths = "team")
+    @Query("select m from Member m")
+    List<Member> findMemberEntityGraph();
+
+    @EntityGraph(attributePaths = "team")
+    List<Member> findEntityGraphByUserName(@Param("userName") String userName);
 }
