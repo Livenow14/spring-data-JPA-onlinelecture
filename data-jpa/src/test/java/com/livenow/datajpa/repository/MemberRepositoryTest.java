@@ -349,9 +349,48 @@ class MemberRepositoryTest {
             System.out.println("member.getUserName() = " + member.getUserName());
             System.out.println("member.getTeam().getClass() = " + member.getTeam().getClass());
             System.out.println("member.getTeam().getName() = " + member.getTeam().getName());
-            
         }
+    }
+
+    /**
+     * 쿼리 최적화, readOnly
+     * 하지만 실제 실무에서 최적화가 많이 안된다. 이점이 많이 없다. 그래서 애매하다. 
+     * 실제 성능 최적화가 일어나는지 테스트를 해봐야한다. 
+     * cache단에서 튜닝이 더 필요하다. 
+     */
+
+    @Test
+    public void queryHint(){
+        //given
+        Member member1 = memberRepository.save(new Member("member1", 10));
+        em.flush();
+        em.clear();
+
+        //when
+       // Member findMember = memberRepository.findById(member1.getId()).get(); // 실무에서는 이렇게 안한다. 원본이랑 가져온거랑 생김. 그래서 readOnly기능 이 필요함.
+        //findMember.setUserName("member2");      //dirty checking 하면서 비용이 더 든다.
+
+        Member findMember = memberRepository.findReadOnlyByUserName("member1");
+        findMember.setUserName("member2");          //이렇게하면 변경이 안된다. readOnly를 열어놨기 때문에
+
+        em.flush();
+    }
 
 
+    /**
+     * 락을 사용하는 법, 자세한건 JPA책을 봐야함.
+     * 실시간 트래픽이 많은경우 락을 잘 안건다.
+     * select문에서 for update이 나온다.
+     */
+    @Test
+    public void Lock(){
+        //given
+        Member member1 = memberRepository.save(new Member("member1", 10));
+        em.flush();
+        em.clear();
+
+        List<Member> member11 = memberRepository.findLockByUserName("member1");
+
+        em.flush();
     }
 }
