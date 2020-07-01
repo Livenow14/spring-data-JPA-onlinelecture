@@ -15,7 +15,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public interface MemberRepository extends JpaRepository<Member, Long> {
+/**
+ * 핵심 비즈니스 로직이 있는 repo랑 화면을 구성하는 repo는 분리하자.
+ * 사용자 정의 리포지가 꼭 필요한것이 아니기 떄문이고, 핵심비즈니스 로직이 잘 안보이기 때문이다.
+ * 아키텍쳐 적으로 고민해야한다. 애플리케이션이 커지면서 커맨드와 쿼리 분리, 핵심 비즈니스 로직, 화면 구성, 라이프 사이클따라서 뭐가 변경되는지 분리할 줄 알아야한다.
+ */
+public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
 
     /**
      * username으로하면 안되는거 확인.

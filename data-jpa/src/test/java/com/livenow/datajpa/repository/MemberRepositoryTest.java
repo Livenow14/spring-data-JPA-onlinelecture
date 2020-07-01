@@ -393,4 +393,25 @@ class MemberRepositoryTest {
 
         em.flush();
     }
+
+    @Test
+    public void callCustom(){
+        //given
+        Member member1 = new Member("member1", 10);
+        Member member2 = new Member("member2", 10);
+        Member member3 = new Member("member3", 10);
+
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+        memberRepository.save(member3);
+
+        //when
+        List<Member> memberCustom = memberRepository.findMemberCustom();
+        List<Member> findAll = memberRepository.findAll();
+
+        assertThat(memberCustom.get(0).getAge()).isEqualTo(findAll.get(0).getAge());
+
+
+
+    }
 }
