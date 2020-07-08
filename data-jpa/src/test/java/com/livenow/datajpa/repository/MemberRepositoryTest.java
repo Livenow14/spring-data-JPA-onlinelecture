@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
@@ -307,7 +306,7 @@ class MemberRepositoryTest {
     }
 
     @Test
-    public void findMemberLazy(){
+    public void findMemberLazy() {
         //given
         //member1 -> teamA
         //member2 -> teamB
@@ -321,34 +320,35 @@ class MemberRepositoryTest {
         Member member1 = new Member("member1", 10, teamA);
         Member member2 = new Member("member2", 10, teamB);
         Member member3 = new Member("member1", 10, teamB);
-        
+
         memberRepository.save(member1);
         memberRepository.save(member2);
         memberRepository.save(member3);
 
         em.flush();
         em.clear();         //commit 하고, 영속성 컨텍스트를 다 날려버림
-        
+
         //when  N + 1 문제
-      //  List<Member> all = memberRepository.findAll();                      //메서드를 override 하고 다시 해봤을때(entitygraph) fetch Join이 됐음을 확인 할 수 있다.
+        List<Member> all = memberRepository.findAll();                      //메서드를 override 하고 다시 해봤을때(entitygraph) fetch Join이 됐음을 확인 할 수 있다.
         //List<Member> all = memberRepository.findMemberFetchJoin();      //프록시가 아닌 진짜 객체가 들어오는 것을 확인할 수 있다.
         /**
          * 엔티티 그래프를 사용하여 fetch를 자동적으로 하게 해줌 
          */
-       // List<Member> all = memberRepository.findAll();                      //메서드를 override 하고 다시 해봤을때(entitygraph) fetch Join이 됐음을 확인 할 수 있다.
-        List<Member> member1s = memberRepository.findEntityGraphByUserName("member1");      //entityGraph는 기본적으로 left outer join을 사용
+        // List<Member> all = memberRepository.findAll();                      //메서드를 override 하고 다시 해봤을때(entitygraph) fetch Join이 됐음을 확인 할 수 있다.
+        //List<Member> member1s = memberRepository.findEntityGraphByUserName("member1");      //entityGraph는 기본적으로 left outer join을 사용
 
-/*
+
         for (Member member : all) {
             System.out.println("member.getUserName() = " + member.getUserName());
             System.out.println("member.getTeam().getClass() = " + member.getTeam().getClass());
             System.out.println("member.getTeam().getName() = " + member.getTeam().getName());   //team 까지는 프록시 객체가 영속성에 있지만(프록시를 초기화 한다는 거임), team의 name은 없기 때문에 쿼리를 다시 날림. 이때 Lazy가 활성화 됐다고 알 수 있다.
-        }*/
 
-        for (Member member : member1s) {
+
+    /*    for (Member member : member1s) {
             System.out.println("member.getUserName() = " + member.getUserName());
             System.out.println("member.getTeam().getClass() = " + member.getTeam().getClass());
             System.out.println("member.getTeam().getName() = " + member.getTeam().getName());
+        }*/
         }
     }
 

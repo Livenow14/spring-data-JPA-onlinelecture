@@ -3,9 +3,7 @@ package com.livenow.datajpa.repository;
 import com.livenow.datajpa.domain.Member;
 import com.livenow.datajpa.dto.MemberDto;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 
@@ -113,6 +111,9 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
     @EntityGraph(attributePaths = "team")
     List<Member> findEntityGraphByUserName(@Param("userName") String userName);
 
+    /**
+     * 쿼리 힌트. readOnly를 표현함.
+     */
     @QueryHints(value = @QueryHint(name="org.hibernate.readOnly", value = "true"))
     Member findReadOnlyByUserName(String userName);
 
@@ -121,4 +122,12 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
      */
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<Member> findLockByUserName(String userName);
+
+    /**
+     * Auditing 오디팅
+     * 엔티티를 생성, 변경할 때 변경한 사람과 시간을 추적
+     * 등록일, 수정일, 등록자, 수정자
+     * 실무에서 많이 사용하는 부분이라 중요함.
+     */
+
 }

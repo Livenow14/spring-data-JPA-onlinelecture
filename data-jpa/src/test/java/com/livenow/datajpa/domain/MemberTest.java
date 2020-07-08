@@ -1,18 +1,16 @@
 package com.livenow.datajpa.domain;
 
+import com.livenow.datajpa.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -21,6 +19,9 @@ class MemberTest {
 
     @PersistenceContext
     EntityManager em;
+
+    @Autowired
+    MemberRepository memberRepository;
 
     @DisplayName("Member Test")
     @Test
@@ -56,5 +57,29 @@ class MemberTest {
 
         //then
     }
+
+    @Test
+    public void JpaEventBaseEntity() throws InterruptedException {
+        //given
+        Member member = new Member("member1");
+        memberRepository.save(member);  //@PrePersist 가 발생함
+
+        Thread.sleep(100);
+        member.setUserName("member2");
+
+        em.flush(); // db에 commit @PreUpdate가 실행행
+        em.clear();
+
+        //when
+        Member findMember = memberRepository.findById(member.getId()).orElseThrow(()->new IllegalStateException("사용자가 없음"));
+
+        //then
+        System.out.println("findMember.getCreateDate() = " + findMember.getCreateDate());
+        System.out.println("findMember.getUpdatedDate() = " + findMember.getLastModifiedDate());
+        System.out.println("findMember.getCreatedBy() = " + findMember.getCreatedBy());
+        System.out.println("findMember.getLastModifiedBy() = " + findMember.getLastModifiedBy());
+        System.out.println("findMember.getUserName() = " + findMember.getUserName());
+    }
+
 
 }
