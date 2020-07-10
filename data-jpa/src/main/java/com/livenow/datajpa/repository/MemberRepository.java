@@ -123,6 +123,8 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<Member> findLockByUserName(String userName);
 
+
+
     /**
      * Auditing 오디팅
      * 엔티티를 생성, 변경할 때 변경한 사람과 시간을 추적
