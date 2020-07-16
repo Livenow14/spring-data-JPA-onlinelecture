@@ -16,7 +16,12 @@ spring:
      #  default_batch_fetch_size: 100    # 이거는 무조건 켜주는게 좋다. 인쿼리의 갯수 (쿼리를 많이 줄여줌 )
                                         # 1000개의 쿼리라면 10번 루프가 돈다. 1 n m 이 1 1 1 이 된다. min 100 max 1000개라고 생각
        #open-in-view: false             #default가 true이다. 영속성 컨텍스트의 생존 범위 차이. 현재는 트랜잭션 번위인 service, repository에 둔것이다.
-
+  data:
+    web:
+      pageable:
+        default-page-size: 10
+        max-page-size: 2000
+        #one-indexed-parameters: true # 1부터 시작하게 함 하지만 가급적 0부터 시작하게한다.
 logging:
   level:
     org.hibernate.SQL: debug  #logger을 통해 하버네이트 실행 sql을 남김

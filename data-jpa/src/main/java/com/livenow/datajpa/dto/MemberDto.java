@@ -1,5 +1,6 @@
 package com.livenow.datajpa.dto;
 
+import com.livenow.datajpa.domain.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,5 +15,10 @@ public class MemberDto {
         this.id = id;
         this.userName = userName;
         this.teamName = teamName;
+    }
+
+    public MemberDto(Member member) {
+        this.id= member.getId();
+        this.userName = member.getUserName();
     }
 }
