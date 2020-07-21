@@ -132,4 +132,32 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
      * 실무에서 많이 사용하는 부분이라 중요함.
      */
 
+    /**
+     * 스프링 데이터 JPA 구현체 분석
+     * JPA Repository에서 왼쪽 버튼을 누르면 볼 수 있다. SimpleJpaRepository가 JPA의 구현체
+     * 기본적으로 Transactional(readOnly = treu)를 걸고있고, 업데이트나 저장의 경우 따로 Transactional 건다.
+     * 그래서 스프링 데이터 JPA를 사용할때 트렌잭션이 없어도 데이터 등록, 변경이 가능했다.
+     * Transactional(readOnly = treu)은 flush를 즉, 커밋을 안하게 해줌. 변경감지 이런것도 하지않기에 약간의 성능향상
+     *
+     * save가 매우 중요함.
+     * 	public <S extends T> S save(S entity) {
+     *
+     * 		if (entityInformation.isNew(entity)) {
+     * 			em.persist(entity);
+     * 			return entity;
+     *                } else {
+     * 			return em.merge(entity);
+     *        }*
+     * }
+     *
+     * 새로운 엔티티면 저장("persist")
+     * 새로운 엔티티가 아니면 병합("merge")
+     * 병합은 DB에 있는 데이터를 가져와서 바꿔치기를 함.
+     * DB에 꺼내서, 파라미터로 넘어온 애로 바꿔치기한다는 것
+     * 단점은 DB select쿼리가 한번 간다는 것임 .
+     *
+     * 이는 성능의 저하를 일으키기 때문에 변경은 dirtyChecking(변경감지)를 사용해야한다.
+     * merge는 준영속상태를 영속상태로 바꿔야할 때 쓰는것이기 때문에. 데이터 변경에서는 사용하면 안된다.
+     * entityInformation.isNew(entity)는 어떻게 진행되는지 확인.
+     */
 }
