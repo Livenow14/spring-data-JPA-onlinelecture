@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.PostConstruct;
-
 
 @RestController
 @RequiredArgsConstructor
@@ -52,7 +50,10 @@ public class MemberController {
         return map;
     }
 
-    @PostConstruct
+    /**
+     * Item Test에서 확인하기 위해 주석처리함
+     */
+    //@PostConstruct
     public void init() {
         for(int i=0; i<100; i++){
             memberRepository.save(new Member("user"+ i, i));
