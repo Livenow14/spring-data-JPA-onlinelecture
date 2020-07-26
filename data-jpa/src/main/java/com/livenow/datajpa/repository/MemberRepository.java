@@ -132,6 +132,7 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
      * 실무에서 많이 사용하는 부분이라 중요함.
      */
 
+
     /**
      * 스프링 데이터 JPA 구현체 분석
      * JPA Repository에서 왼쪽 버튼을 누르면 볼 수 있다. SimpleJpaRepository가 JPA의 구현체
@@ -160,4 +161,11 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
      * merge는 준영속상태를 영속상태로 바꿔야할 때 쓰는것이기 때문에. 데이터 변경에서는 사용하면 안된다.
      * entityInformation.isNew(entity)는 어떻게 진행되는지 확인.
      */
+
+    /**
+     * Specifications(명세)는 실무에서 안쓴다.
+     * 그냥 쓰는 방법만 알고 넘어가는게 좋음 .
+     */
+
+
 }
