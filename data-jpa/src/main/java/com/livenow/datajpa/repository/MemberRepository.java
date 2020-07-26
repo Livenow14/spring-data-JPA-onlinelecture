@@ -123,8 +123,6 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<Member> findLockByUserName(String userName);
 
-
-
     /**
      * Auditing 오디팅
      * 엔티티를 생성, 변경할 때 변경한 사람과 시간을 추적
@@ -189,11 +187,35 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
      * 매칭 조건이 매우 단순함
      * 문자는 starts/contains/ends/regex
      * 다른 속성은 정확한 매칭( = )만 지원
-     * 
+     *
      * 정리
      * 실무에서 사용하기에는 매칭 조건이 너무 단순하고, LEFT 조인이 안됨
      * 실무에서는 QueryDSL을 사용하자
      * */
+
+
+    /**
+     * Projectrions( 전체 엔티티중 원하는 데이터 하나만 가져오게 하고싶다~)
+     * 구현체가 아닌 인터페이스다.
+     *
+     * 주의
+     * 프로젝션 대상이 root 엔티티면, JPQL SELECT 절 최적화 가능
+     * 프로젝션 대상이 ROOT가 아니면
+     * LEFT OUTER JOIN 처리
+     * 모든 필드를 SELECT해서 엔티티로 조회한 다음에 계산
+     *
+     * 정리
+     * 프로젝션 대상이 root 엔티티면 유용하다.
+     * 프로젝션 대상이 root 엔티티를 넘어가면 JPQL SELECT 최적화가 안된다!
+     * 실무의 복잡한 쿼리를 해결하기에는 한계가 있다.
+     * 실무에서는 단순할 때만 사용하고, 조금만 복잡해지면 QueryDSL을 사용하자
+     *
+     */
+    List<UserNameOnly> findProjectionsByUserName(String username);
+
+    List<UserNameOnlyDto> findProjectionsDtoByUserName(String username);    //Dto 클래스를 통한 사용
+
+    <T>List<T> findProjecstionsByUserName(String username, Class<T> type);
 
 
 }

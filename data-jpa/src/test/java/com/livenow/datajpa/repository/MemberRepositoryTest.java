@@ -467,4 +467,81 @@ class MemberRepositoryTest {
         List<Member> result = memberRepository.findAll(example);
         assertThat(result.get(0).getUserName()).isEqualTo("m1");
     }
+
+    /**
+     * Projectrions( 전체 엔티티중 원하는 데이터 하나만 가져오게 하고싶다~)
+     * 구현체가 아닌 인터페이스다.
+     *
+     * 주의
+     * 프로젝션 대상이 root 엔티티면, JPQL SELECT 절 최적화 가능
+     * 프로젝션 대상이 ROOT가 아니면
+     * LEFT OUTER JOIN 처리
+     * 모든 필드를 SELECT해서 엔티티로 조회한 다음에 계산
+     *
+     * 정리
+     * 프로젝션 대상이 root 엔티티면 유용하다.
+     * 프로젝션 대상이 root 엔티티를 넘어가면 JPQL SELECT 최적화가 안된다!
+     * 실무의 복잡한 쿼리를 해결하기에는 한계가 있다.
+     * 실무에서는 단순할 때만 사용하고, 조금만 복잡해지면 QueryDSL을 사용하자
+     *
+     */
+    @Test
+    public void projections () {
+        //given
+        Team teamA = new Team("teamA");
+        em.persist(teamA);
+
+        Member m1 = new Member("m1", 0, teamA);
+        Member m2 = new Member("m2", 0, teamA);
+        Member m3 = new Member("m3", 0, teamA);
+        em.persist(m1);
+        em.persist(m2);
+
+        em.flush();
+        em.clear();
+        //when
+        List<UserNameOnly> result = memberRepository.findProjectionsByUserName("m1");
+
+        //then
+        for (UserNameOnly userNameOnly : result) {
+            System.out.println("userNameOnly = " + userNameOnly.getUserName());
+        }
+
+
+        /**
+         * Dto를 통한 Projection
+         */
+        //when
+        List<UserNameOnlyDto> m11 = memberRepository.findProjectionsDtoByUserName("m1");
+
+        //then
+        for (UserNameOnlyDto userNameOnlyDto : m11) {
+            System.out.println("userNameOnlyDto.getUserName() = " + userNameOnlyDto.getUserName());
+        }
+
+        /**
+         * 동적 Projections, class나 interface등 모두 사용가능하다.
+         */
+        //when
+        List<UserNameOnlyDto> m12 = memberRepository.findProjectionsByUserName("m1", UserNameOnlyDto.class);
+
+        //then
+        for (UserNameOnlyDto userNameOnlyDto : m12) {
+            System.out.println("userNameOnlyDto.getUserName() = " + userNameOnlyDto.getUserName());
+        }
+
+        /**
+         * 중첩 projection은 중첩될 시 쓰기가 애매해진다
+         */
+        //when
+        List<NestedClosedProjections> m13 = memberRepository.findProjectionsByUserName("m1", NestedClosedProjections.class);
+
+        //then
+        for (NestedClosedProjections nestedClosedProjections : m13) {
+            String userName = nestedClosedProjections.getUserName();
+            System.out.println("userName = " + userName);
+            String name = nestedClosedProjections.getTeam().getName();
+            System.out.println("name = " + name);
+        }
+    }
 }
