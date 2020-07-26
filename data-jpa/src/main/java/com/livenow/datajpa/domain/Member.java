@@ -7,7 +7,7 @@ import javax.persistence.*;
 @Entity
 @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(of={"id", "username", "age"})     //가급걱이면 연관관계 필드는 안하는게 좋다.
+@ToString(of={"id", "userName", "age"})     //가급걱이면 연관관계 필드는 안하는게 좋다.
 public class Member extends BaseEntity {
 
     @Id @GeneratedValue

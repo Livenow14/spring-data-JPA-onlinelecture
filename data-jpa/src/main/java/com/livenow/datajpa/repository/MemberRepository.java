@@ -215,7 +215,38 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
 
     List<UserNameOnlyDto> findProjectionsDtoByUserName(String username);    //Dto 클래스를 통한 사용
 
-    <T>List<T> findProjecstionsByUserName(String username, Class<T> type);
+    <T>List<T> findProjectionsByUserName(String username, Class<T> type);
 
+    /**
+     * 네이티브 쿼리
+     * 이는 제약사항이 너무 많고, 반환타입이 몇가지 지원하지 않는다.
+     * 그렇기 쨰문에 프로젝션이나 Custom을 사용한다.
+     *
+     * 페이징 지원
+     *
+     * 반환 타입
+     * Object[]
+     * Tuple
+     * DTO(스프링 데이터 인터페이스 Projections 지원)
+     *
+     * 제약
+     * Sort 파라미터를 통한 정렬이 정상 동작하지 않을 수 있음(믿지 말고 직접 처리)
+     * JPQL처럼 애플리케이션 로딩 시점에 문법 확인 불가
+     * 동적 쿼리 불가
+     * JPQL은 위치 기반 파리미터를 1부터 시작하지만 네이티브 SQL은 0부터 시작
+     * 네이티브 SQL을 엔티티가 아닌 DTO로 변환은 하려면
+     * DTO 대신 JPA TUPLE 조회
+     * DTO 대신 MAP 조회
+     * @SqlResultSetMapping 복잡
+     * Hibernate ResultTransformer를 사용해야함 복잡
+     * https://vladmihalcea.com/the-best-way-to-map-a-projection-query-to-a-dto-with-jpaand-hibernate/
+     * 네이티브 SQL을 DTO로 조회할 때는 JdbcTemplate or myBatis 권장
+     */
+
+    @Query(value = "SELECT m.member_id as m.id, m.userName, t.name as teamName " +
+            "FROM member m left join team t",
+            countQuery = "SELECT count(*) from member",
+            nativeQuery = true)
+    Page<MemberProjection> findByNativeProjection(Pageable pageable);
 
 }
