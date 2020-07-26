@@ -11,7 +11,7 @@ spring:
     properties:
       hibernate:
      #   dialect:                     #방언 설정
-        show_sql: true
+     #   show_sql: true
         format_sql: true
      #  default_batch_fetch_size: 100    # 이거는 무조건 켜주는게 좋다. 인쿼리의 갯수 (쿼리를 많이 줄여줌 )
                                         # 1000개의 쿼리라면 10번 루프가 돈다. 1 n m 이 1 1 1 이 된다. min 100 max 1000개라고 생각
